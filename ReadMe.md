@@ -1,33 +1,37 @@
 # Docker Compose Getting Started
-Built from the "getting started" guide on docs.docker.com:
-https://docs.docker.com/compose/gettingstarted/
 
-# Required
-1. [Docker](https://www.docker.com/products/docker)
-2. [Docker Compose](https://docs.docker.com/compose/install/) (should come with [Docker CE](https://store.docker.com/search?offering=community&type=edition) for macOS and Windows)
-3. (optional) a GUI, mostly needed if you're using docker toolbox, but can be helpful for the less Docker experienced
-    - [Portainer](https://www.portainer.io/)
-    - [Kitematic](https://kitematic.com/)
+This is built as a fork from [edm00se/simple-docker-compose-node-redis-demo](https://github.com/edm00se/simple-docker-compose-node-redis-demo), which is a [Node.js](https://nodejs.org/) re-interpretation of [the Docker "getting started" guide from their docs](https://docs.docker.com/compose/gettingstarted/). If you are unfamiliar with either, you should start there.
 
-# Adapted
-Adapted from the original docker compose getting started guide to use Node w/ the Express framework in place of python.
+This project extends [edm00se/simple-docker-compose-node-redis-demo](https://github.com/edm00se/simple-docker-compose-node-redis-demo) by:
 
-## Create from Scratch
+- adding [traefik](https://docs.traefik.io/) as a load balancer, via the `docker-compose.yml` config
+- re-configuring the `Dockerfile` to expose the HTTP port, instead of solely within the `docker-compose.yml` configuration
+  - this allows traefik to pick it up automagically
+- the `app.js` response now incldues the container ID as "hostname" in the response
 
-1. Create Docker image, build `Dockerfile`
-2. Build the image, `docker build -t web .`
-3. Define services, port bindings, in `docker-compose.yml`
-4. Build and run w/ compose, `docker-compose up` (add `-d` for it to run 'detatched', in background)
+## Required
 
-\* To remove the container(s) defined by the `docker-compose.yml`, run `docker-compose rm` from cwd.
+1. [Docker](https://www.docker.com/)
+2. [Docker Compose](https://docs.docker.com/compose/install/) (this should come with [Docker CE / Docker Desktop](https://store.docker.com/search?offering=community&type=edition) for both macOS and Windows)
 
 ## Clone and Run
 
-1. `git clone https://github.com/edm00se/simple-docker-compose-node-redis-demo.git`
-2. `cd simple-docker-compose-node-redis-demo`
+1. `git clone https://github.com/edm00se/proxy-simple-docker-compose-node-redis-demo.git`
+2. `cd proxy-simple-docker-compose-node-redis-demo`
 3. `docker-compose up` (first time run will perform build)
     - you can force a fresh build with `--build`
     - you can background (run without holding up your CLI) by using `--detach`
+    - you can stop and remove the containers associated by substituting `down` in place of `up`
+4. `docker-compose up -d --scale web=2` will scale up the "web" app service of our compose config to the specified number
 
-# License
+## Test
+
+```sh
+curl -H Host:myapp.docker.localhost http://127.0.0.1
+```
+
+The "myapp" label is applied in the defined `labels:` field for the `docker-compose.yml` config definition of the web app "service". By specifying a `Host` header in our request, we are specifying a destination that traefik can interpret.
+
+## License
+
 The MIT License (MIT).
