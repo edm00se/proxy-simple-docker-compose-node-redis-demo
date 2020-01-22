@@ -4,12 +4,22 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-     - "3000:3000"
+#    ports:
+#     - "3000:3000"
     volumes:
      - .:/code
      - /code/node_modules
     depends_on:
      - redis
+    labels:
+      - "traefik.http.routers.myapp.rule=Host(`myapp.docker.localhost`)"
   redis:
     image: redis:alpine
+  reverse-proxy:
+    image: traefik:v2.0
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

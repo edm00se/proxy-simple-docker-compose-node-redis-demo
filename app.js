@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
+const HOSTNAME = process.env.HOSTNAME;
 
 const options = {
   host: 'redis',
@@ -23,7 +24,7 @@ RedisStore['hits'] = 0;
 app.get('/', (req, res) => {
   RedisStore['hits']++;
   const num = RedisStore['hits'];
-  res.send(`Hello World!<br><p>I have been loaded ${num} times.</p>`);
+  res.send(`Hello World!<br><h3>${HOSTNAME}</h3><br><p>I have been loaded ${num} times.</p>`);
 });
 
 app.listen(3000, () => {
